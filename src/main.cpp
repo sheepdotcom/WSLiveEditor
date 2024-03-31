@@ -297,8 +297,10 @@ void handleMessage(const matjson::Value& msg, ix::WebSocket& client)
     }
     else if(actionstr == "COLOR_CHANNEL")
     {
-        if(!msg.contains("channels") || !msg["channels"].is_array())
-            return sendStatus(client, WSLiveStatus::InvalidJson, "''channels' key is missing or is the wrong type", msg);
+        if (!msg.contains("channels") || !msg["channels"].is_array())
+        {
+            return sendStatus(client, WSLiveStatus::InvalidJson, "'channels' key is missing or is the wrong type", msg);
+        }
 
         auto channelsarr = msg["channels"].as_array();
         std::vector<WSLiveColorChannel> channelsvec; //god i hate this but whatever
@@ -325,6 +327,134 @@ void handleMessage(const matjson::Value& msg, ix::WebSocket& client)
                     else ca->setupFromString(ch.getStringAsGDLevel());
                 }
             }
+            sendStatus(client, WSLiveStatus::Success, std::string{}, msg);
+        });
+    }
+    else if (actionstr == "SETTINGS")
+    {
+        if (!msg.contains("settings") || !msg["settings"].is_object())
+        {
+            return sendStatus(client, WSLiveStatus::InvalidJson, "'settings' field is missing or is the wrong type", msg);
+        }
+        
+        auto settingsarr = msg["settings"];
+        if (settingsarr.contains("platformer") && !settingsarr["platformer"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'platformer' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("startMode") && !settingsarr["startMode"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'startMode' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("startSpeed") && !settingsarr["startSpeed"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'startSpeed' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("font") && !settingsarr["font"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'font' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("ground") && !settingsarr["ground"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'ground' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("background") && !settingsarr["background"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'background' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("middleground") && !settingsarr["middleground"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'middleground' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("song") && !settingsarr["song"].is_object()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'song' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("song") && settingsarr["song"].is_object())
+        {
+            auto songarr = settingsarr["song"];
+            if (!songarr.contains("custom") || !songarr["custom"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'custom' field in song in settings is missing or is the wrong type", msg); }
+            if (!songarr.contains("songID") || !songarr["songID"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'songID' field in song in settings is missing or is the wrong type", msg); }
+        }
+        if (settingsarr.contains("options") && !settingsarr["options"].is_object()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'options' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("options") && settingsarr["options"].is_object())
+        {
+            auto optionsarr = settingsarr["options"];
+            if (optionsarr.contains("miniMode") && !optionsarr["miniMode"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'miniMode' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("twoPlayer") && !optionsarr["twoPlayer"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'twoPlayer' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("flipGravity") && !optionsarr["flipGravity"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'flipGravity' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("reverseGameplay") && !optionsarr["reverseGameplay"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'reverseGameplay' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("dualMode") && !optionsarr["dualMode"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'dualMode' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("mirrorMode") && !optionsarr["mirrorMode"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'mirrorMode' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("rotateGameplay") && !optionsarr["rotateGameplay"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'rotateGameplay' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("noTimePenalty") && !optionsarr["noTimePenalty"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'noTimePenalty' field in options in settings is the wrong type", msg); }
+            if (optionsarr.contains("spawnGroup") && !optionsarr["spawnGroup"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'spawnGroup' field in options in settings is the wrong type", msg); }
+        }
+        if (settingsarr.contains("legacy") && !settingsarr["legacy"].is_object()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'legacy' field in settings is the wrong type", msg); }
+        if (settingsarr.contains("legacy") && settingsarr["legacy"].is_object())
+        {
+            auto legacyarr = settingsarr["legacy"];
+            if (legacyarr.contains("allowMultiRotation") && !legacyarr["allowMultiRotation"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'allowMultiRotation' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("allowStaticRotate") && !legacyarr["allowStaticRotate"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'allowStaticRotate' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("fixGravityBug") && !legacyarr["fixGravityBug"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'fixGravityBug' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("fixRobotJump") && !legacyarr["fixRobotJump"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'fixRobotJump' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("sortGroups") && !legacyarr["sortGroups"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'sortGroups' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("enable22Changes") && !legacyarr["enable22Changes"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'enable22Changes' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("enablePlayerSqueeze") && !legacyarr["enablePlayerSqueeze"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'enablePlayerSqueeze' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("fixNegativeScale") && !legacyarr["fixNegativeScale"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'fixNegativeScale' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("dynamicLevelHeight") && !legacyarr["dynamicLevelHeight"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'dynamicLevelHeight' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("fixRadiusCollision") && !legacyarr["fixRadiusCollision"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'fixRadiusCollision' field in legacy in settings is the wrong type", msg); }
+            if (legacyarr.contains("reverseSync") && !legacyarr["reverseSync"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'reverseSync' field in legacy in settings is the wrong type", msg); }
+            //if (legacyarr.contains("decreaseBoostSlide") && !legacyarr["decreaseBoostSlide"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'decreaseBoostSlide' field in legacy in settings is the wrong type", msg); }
+        }
+        queueFunction([msg, settingsarr, &client](LevelEditorLayer* editor) {
+            if (settingsarr.contains("platformer"))
+            {
+                editor->m_levelSettings->m_platformerMode = settingsarr["platformer"].as_bool();
+            };
+            if (settingsarr.contains("startMode"))
+            {
+                auto startMode = settingsarr["startMode"].as_int();
+                if (startMode < 0 || startMode > 7) { startMode = 0; } //Anti-Crash Prevention!
+                editor->m_levelSettings->m_startMode = startMode;
+            };
+            if (settingsarr.contains("startSpeed"))
+            {
+                editor->m_levelSettings->m_startSpeed = static_cast<Speed>(settingsarr["startSpeed"].as_int()); //Tested For Crashes
+            };
+            if (settingsarr.contains("font"))
+            {
+                editor->m_levelSettings->m_fontIndex = settingsarr["font"].as_int();
+            };
+            if (settingsarr.contains("ground"))
+            {
+                editor->m_levelSettings->m_groundIndex = settingsarr["ground"].as_int();
+            };
+            if (settingsarr.contains("background"))
+            {
+                editor->m_levelSettings->m_backgroundIndex = settingsarr["background"].as_int();
+            };
+            if (settingsarr.contains("middleground"))
+            {
+                editor->m_levelSettings->m_middleGroundIndex = settingsarr["middleground"].as_int();
+            };
+            if (settingsarr.contains("song"))
+            {
+                auto songarr = settingsarr["song"];
+                if (songarr["custom"].as_bool())
+                {
+                    editor->m_level->m_songID = songarr["songID"].as_int(); //Why is the custom song in m_level?
+                }
+                else {
+                    editor->m_levelSettings->m_defaultSongID = songarr["songID"].as_int();
+                    editor->m_level->m_songID = 0;
+                }
+            };
+            if (settingsarr.contains("options"))
+            {
+                auto optionsarr = settingsarr["options"];
+                if (optionsarr.contains("miniMode")) { editor->m_levelSettings->m_startMini = optionsarr["miniMode"].as_bool(); }
+                if (optionsarr.contains("twoPlayer")) { editor->m_levelSettings->m_twoPlayerMode = optionsarr["twoPlayer"].as_bool(); }
+                if (optionsarr.contains("flipGravity")) { editor->m_levelSettings->m_isFlipped = optionsarr["flipGravity"].as_bool(); }
+                if (optionsarr.contains("reverseGameplay")) { editor->m_levelSettings->m_reverseGameplay = optionsarr["reverseGameplay"].as_bool(); }
+                if (optionsarr.contains("dualMode")) { editor->m_levelSettings->m_startDual = optionsarr["dualMode"].as_bool(); }
+                if (optionsarr.contains("mirrorMode")) { editor->m_levelSettings->m_mirrorMode = optionsarr["mirrorMode"].as_bool(); }
+                if (optionsarr.contains("rotateGameplay")) { editor->m_levelSettings->m_rotateGameplay = optionsarr["rotateGameplay"].as_bool(); }
+                if (optionsarr.contains("noTimePenalty")) { editor->m_levelSettings->m_noTimePenalty = optionsarr["noTimePenalty"].as_bool(); }
+                if (optionsarr.contains("spawnGroup")) { editor->m_levelSettings->m_spawnGroup = optionsarr["spawnGroup"].as_int(); }
+            };
+            if (settingsarr.contains("legacy"))
+            {
+                auto legacyarr = settingsarr["legacy"];
+                if (legacyarr.contains("allowMultiRotation")) { editor->m_levelSettings->m_allowMultiRotation = legacyarr["allowMultiRotation"].as_bool(); }
+                if (legacyarr.contains("allowStaticRotate")) { editor->m_levelSettings->m_allowStaticRotate = legacyarr["allowStaticRotate"].as_bool(); }
+                if (legacyarr.contains("fixGravityBug")) { editor->m_levelSettings->m_fixGravityBug = legacyarr["fixGravityBug"].as_bool(); }
+                if (legacyarr.contains("fixRobotJump")) { editor->m_levelSettings->m_fixRobotJump = legacyarr["fixRobotJump"].as_bool(); }
+                if (legacyarr.contains("sortGroups")) { editor->m_levelSettings->m_sortGroups = legacyarr["sortGroups"].as_bool(); }
+                if (legacyarr.contains("enable22Changes")) { editor->m_levelSettings->m_enable22Changes = legacyarr["enable22Changes"].as_bool(); }
+                if (legacyarr.contains("enablePlayerSqueeze")) { editor->m_levelSettings->m_enablePlayerSqueeze = legacyarr["enablePlayerSqueeze"].as_bool(); }
+                if (legacyarr.contains("fixNegativeScale")) { editor->m_levelSettings->m_fixNegativeScale = legacyarr["fixNegativeScale"].as_bool(); }
+                if (legacyarr.contains("dynamicLevelHeight")) { editor->m_levelSettings->m_dynamicLevelHeight = legacyarr["dynamicLevelHeight"].as_bool(); }
+                if (legacyarr.contains("fixRadiusCollision")) { editor->m_levelSettings->m_fixRadiusCollision = legacyarr["fixRadiusCollision"].as_bool(); }
+                if (legacyarr.contains("reverseSync")) { editor->m_levelSettings->m_reverseSync = legacyarr["reverseSync"].as_bool(); }
+                //if (legacyarr.contains("decreaseBoostSlide")) { editor->m_levelSettings->m_decreaseBoostSlide = legacyarr["decreaseBoostSlide"].as_bool(); } //Why is there no field for this.
+            };
             sendStatus(client, WSLiveStatus::Success, std::string{}, msg);
         });
     }
