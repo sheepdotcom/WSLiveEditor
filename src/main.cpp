@@ -73,7 +73,7 @@ struct WSLiveColorChannel
         auto id = obj.find("id");
         if(id == obj.end()) throw std::exception("id key not found");
         int id_val = id->second.as_int();
-        if(id_val < 0 || id_val > 999) throw std::exception("id key must be an int");
+        if(id_val < 0 || id_val > 1014) throw std::exception("id key is not between 0 and 1014"); //Now you can edit background and stuff + clearer error message.
 
         auto colstring = obj.find("string");
         if(colstring != obj.end() && colstring->second.is_string())
