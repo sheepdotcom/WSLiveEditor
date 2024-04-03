@@ -351,6 +351,9 @@ void handleMessage(const matjson::Value& msg, ix::WebSocket& client)
             auto songarr = settingsarr["song"];
             if (!songarr.contains("custom") || !songarr["custom"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'custom' field in song in settings is missing or is the wrong type", msg); }
             if (!songarr.contains("songID") || !songarr["songID"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'songID' field in song in settings is missing or is the wrong type", msg); }
+            if (songarr.contains("songOffset") && !songarr["songOffset"].is_number()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'songOffset' field in song in settings is the wrong type", msg); }
+            if (songarr.contains("fadeIn") && !songarr["fadeIn"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'fadeIn' field in song in settings is the wrong type", msg); }
+            if (songarr.contains("fadeOut") && !songarr["fadeOut"].is_bool()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'fadeOut' field in song in settings is the wrong type", msg); }
         }
         if (settingsarr.contains("options") && !settingsarr["options"].is_object()) { return sendStatus(client, WSLiveStatus::InvalidJson, "'options' field in settings is the wrong type", msg); }
         if (settingsarr.contains("options") && settingsarr["options"].is_object())
@@ -425,6 +428,9 @@ void handleMessage(const matjson::Value& msg, ix::WebSocket& client)
                     editor->m_levelSettings->m_defaultSongID = songarr["songID"].as_int();
                     editor->m_level->m_songID = 0;
                 }
+                if (songarr.contains("songOffset")) { editor->m_levelSettings->m_songOffset = songarr["songOffset"].as_double(); }
+                if (songarr.contains("fadeIn")) { editor->m_levelSettings->m_fadeIn = songarr["fadeIn"].as_bool(); }
+                if (songarr.contains("fadeOut")) { editor->m_levelSettings->m_fadeOut = songarr["fadeOut"].as_bool(); }
             };
             if (settingsarr.contains("options"))
             {
